@@ -5,5 +5,7 @@ Still Processing...
 2. 각 공의 경계값 중간 좌표로 오브젝트 위치 설정
 
 # 개발환경
-언어 : Python, Opencv
-구동환경 : Raspberry-Pi 3 Model B+
+
+ 언어 : Python, Opencv
+ 
+ 구동환경 : Raspberry-Pi 3 Model B+
