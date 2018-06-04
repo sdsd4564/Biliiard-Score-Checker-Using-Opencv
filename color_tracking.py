@@ -25,6 +25,10 @@ props = {'yellow': None, 'red': None}
 
 # if a video path was not supplied, grab the reference
 # to the webcam
+
+fourcc = cv2.VideoWriter_fourcc(*'MJPG')
+writer = cv2.VideoWriter("output.avi", fourcc, 30.0, (800, 450), True)
+
 if not args.get("video", False):
     camera = cv2.VideoCapture(0)
 
@@ -80,7 +84,6 @@ while True:
                         continue
 
             # c = max(cnts, key=cv2.contourArea)
-            # ((pts[key][0], pts[key][1]), radius) = cv2.minEnclosingCircle(props[key])
             (pts[key], radius) = cv2.minEnclosingCircle(props[key])
             M = cv2.moments(props[key])
             center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
@@ -102,6 +105,7 @@ while True:
 
     # show the frame to our screen
     cv2.imshow("Frame", frame)
+    writer.write(frame)
 
     key = cv2.waitKey(5) & 0xFF
     # if the 'q' key is pressed, stop the loop
@@ -110,4 +114,5 @@ while True:
 
 # cleanup the camera and close any open windows
 camera.release()
+writer.release()
 cv2.destroyAllWindows()
