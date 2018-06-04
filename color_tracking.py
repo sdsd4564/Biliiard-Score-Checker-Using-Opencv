@@ -14,8 +14,8 @@ ap.add_argument("-b", "--buffer", type=int, default=64,
                 help="max buffer size")
 args = vars(ap.parse_args())
 
-lower = {'yellow': (0, 73, 173), 'red': (145, 82, 60)}
-upper = {'yellow': (48, 186, 255), 'red': (255, 255, 255)}
+lower = {'yellow': (16, 132, 202), 'red': (145, 82, 60)}
+upper = {'yellow': (75, 255, 255), 'red': (255, 255, 255)}
 colors = {'red': (0, 0, 255), 'yellow': (0, 255, 217)}
 deque = {'yellow': deque(maxlen=args["buffer"]),
          'red': deque(maxlen=args["buffer"])}
@@ -27,7 +27,7 @@ props = {'yellow': None, 'red': None}
 # to the webcam
 
 fourcc = cv2.VideoWriter_fourcc(*'MJPG')
-writer = cv2.VideoWriter("output.avi", fourcc, 30.0, (800, 450), True)
+writer = None
 
 if not args.get("video", False):
     camera = cv2.VideoCapture(0)
@@ -51,7 +51,10 @@ while True:
 
     # resize the frame, blur it, and convert it to the HSV
     # color space
-    frame = imutils.resize(frame, width=800)
+    frame = imutils.resize(frame, width=410)
+    if writer is None:
+        (h, w) = frame.shape[:2]
+        writer = cv2.VideoWriter("output.avi", fourcc, 30.0, (w, h), True)
 
     # blurred = cv2.GaussianBlur(frame, (11, 11), 0)
     # hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
@@ -70,6 +73,7 @@ while True:
 
         if len(contours) > 0:
             # 경계값 중 먼저 찾은 경계값에서 가까운 경계값만 추적함
+
             for contour in contours:
                 if props[key] is None:
                     props[key] = contours[0]
@@ -78,7 +82,7 @@ while True:
                     cx, cy = (int(moment['m10'] / moment['m00']), int(moment['m01'] / moment['m00']))
 
                     # 미세한 조정 필요(속도, 물체개입 등)
-                    if abs(cx - pts[key][0]) < 20 or abs(cy - pts[key][1]) < 20:
+                    if abs(cx - pts[key][0]) < 25 or abs(cy - pts[key][1]) < 25:
                         props[key] = contour
                     else:
                         continue
@@ -107,7 +111,7 @@ while True:
     cv2.imshow("Frame", frame)
     writer.write(frame)
 
-    key = cv2.waitKey(5) & 0xFF
+    key = cv2.waitKey(15) & 0xFF
     # if the 'q' key is pressed, stop the loop
     if key == ord("q"):
         break
